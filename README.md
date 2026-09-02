@@ -1,8 +1,8 @@
 # MIS3060 Business Intelligence with AI
 Villanova School of Business — Fall 2026
 
-**Student:** [Megan Zuzarth]
-**GitHub:** [mezuzarth]
+**Student:** Megan Zuzarth
+**GitHub:** mezuzarth
 
 ## About This Repository
 This repository contains all lab exercises, homework assignments, and project
