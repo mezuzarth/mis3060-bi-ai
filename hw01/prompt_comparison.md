@@ -10,3 +10,7 @@ Part 3 - Prompt Engineering Comparison
 
 **Conclusion**: The original prompt gave Claude a broad and detailed answer, but it did not provide any specific context for how the information would be used. The role-based prompt produced a more useful response because Claude was given the relevant context of being a bank manager, which made the answer more practical and focused on how the metrics would be used in a real  setting. The example-format prompt made the response the most organized and easiest to read, but it did not add as much relevant context to the answer itself. Overall, I think the role-based strategy was the most useful for a BI analyst because the added context helped Claude prioritize information that would be most relevant for analyzing and monitoring a consumer loan portfolio.
 
+## Fact-Check
+
+|  Exact Claim   | Source & URL | Source Information | Few-shot |
+| --- | --- | --- | --- |
