@@ -1,1 +1,35 @@
+Part 3 - Prompt Engineering Comparison
+-------------------------------------------------------------------------
+**Question**: What are the most important metrics for measuring credit risk in a consumer loan portfolio?
+
+|     | Zero-shot | Role-assigned | Few-shot |
+| --- | --- | --- | --- |
+|  **Complete Prompt** | What are the most important metrics for measuring credit risk in a consumer loan portfolio? | You are a bank manager reviewing the performance of your consumer loan portfolio. What are the most important metrics for measuring credit risk in a consumer loan portfolio? | Answer: What are the most important metrics for measuring credit risk in a consumer loan portfolio?
+Example format:
+Metric: x
+Why it matters: y
+Metric: x
+Why it matters: y |
+| **First 150 Words of Response** | The core metrics fall into a few categories, and a good credit risk framework in consumer lending usually combines backward-looking performance measures with forward-looking predictive ones.
+On the loss and performance side, the most fundamental are delinquency rates (the percentage of balances 30/60/90+ days past due) and the net charge-off rate (the portion of the portfolio written off as uncollectible, net of recoveries, usually expressed annualized as a percentage of average receivables). Roll rate analysis — the rate at which accounts migrate from one delinquency bucket to the next (current to 30 days, 30 to 60, and so on) — is one of the most useful early-warning tools because it shows deterioration before it hits the charge-off line. Vintage analysis, which tracks loss performance by origination cohort over time, is the standard way to see whether newer loans are performing better or worse than older ones and to isolate underwriting quality from 
+ | Stepping into that seat, here's how I'd think about it.
+The most immediate signals are delinquency rates — the share of balances 30/60/90+ days past due — and the net charge-off rate, which is the portion of the portfolio actually written off as uncollectible (net of recoveries), usually annualized as a percentage of average receivables. These are the numbers I'd expect on a monthly dashboard, since they show current portfolio health at a glance.
+Roll rate analysis is one of the most useful tools for spotting trouble early: it tracks the rate at which accounts migrate from one delinquency bucket to the next (current to 30 days, 30 to 60, and so on), so deterioration shows up before it ever reaches the charge-off line. Paired with vintage analysis — loss performance tracked by origination cohort — I can tell whether newer loans are underwriting worse than older ones, or whether losses are being driven 
+ | •  Metric: Delinquency rate (30/60/90+ days past due)
+Why it matters: Shows current portfolio health and how much of the book is falling behind on payments before it becomes a loss. 
+•  Metric: Net charge-off rate
+Why it matters: Captures actual realized losses (written off, net of recoveries) as a percentage of average receivables — the bottom-line measure of credit performance. 
+•  Metric: Roll rate
+Why it matters: Tracks how accounts migrate between delinquency buckets, giving an early warning of deterioration before charge-offs occur. 
+•  Metric: Vintage analysis
+Why it matters: Breaks loss performance out by origination cohort, isolating whether newer underwriting is weaker or losses are driven by macro conditions.
+•  Metric: Probability of default (PD)
+Why it matters: Estimates the likelihood a borrower defaults, the foundational input to expected loss and pricing models. 
+•  Metric: Loss given default (LGD)
+Why it matters: Measures the share of exposure actually lost once a default occurs, driven by collateral 
+ |
+| **Evaluation** | Claude’s response was comprehensive and covered a wide range of important credit risk metrics: delinquency, charge-off rates, roll rates, PD, LGD, EAD, and portfolio composition, etc.. I thought the explanations were clear and showed how each metric relates to different parts of managing credit risk, which made the response useful for understanding the topic. However, it included more information than necessary for a general question and could have prioritized the most important metrics more clearly for the user's understanding.
+ | Claude’s response was more focused and practical after being given the role of a credit risk analyst. It organized the metrics into different areas, such as portfolio performance, modeling, and portfolio composition, while explaining how each metric would be used in a real banking setting. Compared with the first response, I think the role assignment made the answer feel more professional and relevant, | Claude followed the requested bullet-point format very closely and gave a clear explanation of why each metric is important. The format made the response easy to read and included a lot of useful information, but it still provided 14 metrics, which may be more than necessary when the question asks for the “most important” ones. |
+
+**Conclusion**: The original prompt gave Claude a broad and detailed answer, but it did not provide any specific context for how the information would be used. The role-based prompt produced a more useful response because Claude was given the relevant context of being a bank manager, which made the answer more practical and focused on how the metrics would be used in a real  setting. The example-format prompt made the response the most organized and easiest to read, but it did not add as much relevant context to the answer itself. Overall, I think the role-based strategy was the most useful for a BI analyst because the added context helped Claude prioritize information that would be most relevant for analyzing and monitoring a consumer loan portfolio.
 
