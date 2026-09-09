@@ -12,5 +12,6 @@ Part 3 - Prompt Engineering Comparison
 
 ## Fact-Check
 
-|  Exact Claim   | Source & URL | Source Information | Few-shot |
+|  Exact Claim   | Source & URL | Source Information | Agreement? |
 | --- | --- | --- | --- |
+| Underneath those, the modeling metrics that everything else is built on are probability of default (PD), loss given default (LGD), and exposure at default (EAD). Multiplied together they give expected loss, which feeds directly into pricing, reserves, and capital planning. | Global Association of Risk Professionals https://www.garp.org/risk-intelligence/credit/credit-risk-measurement-alternatives-250207 | "The multiplication of PD and LGD is the expected loss as a percentage of the exposure." | The source agrees with Claude's claim. |
