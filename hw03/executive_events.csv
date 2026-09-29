@@ -1,0 +1,27 @@
+company,ticker,cik,filing_date,event_type,person_name,title,effective_date
+Apple Inc.,AAPL,0000320193,2026-04-20,appointment,John Ternus,Chief Executive Officer,NOT_FOUND
+Apple Inc.,AAPL,0000320193,2026-01-02,appointment,Ben Borders,Principal Accounting Officer,"January 1, 2026"
+Apple Inc.,AAPL,0000320193,2025-12-05,departure,Kate Adams,NOT_FOUND,NOT_FOUND
+Microsoft Corporation,MSFT,0000789019,2026-06-05,departure,Reid Hoffman,member of the Board of Directors,NOT_FOUND
+Microsoft Corporation,MSFT,0000789019,2026-05-14,appointment,Carmine Di Sibio,NOT_FOUND,"May 13, 2026"
+Microsoft Corporation,MSFT,0000789019,2025-12-08,NOT_FOUND,NOT_FOUND,NOT_FOUND,NOT_FOUND
+Microsoft Corporation,MSFT,0000789019,2025-09-30,NOT_FOUND,NOT_FOUND,NOT_FOUND,NOT_FOUND
+NVIDIA Corporation,NVDA,0001045810,2026-07-02,departure,Ajay K. Puri,NOT_FOUND,NOT_FOUND
+NVIDIA Corporation,NVDA,0001045810,2026-07-02,appointment,Nicholas Parker,"Executive Vice President, Worldwide Field Operations of the Company","August 24, 2026"
+NVIDIA Corporation,NVDA,0001045810,2026-05-08,appointment,Suzanne Nora Johnson,member of the Board of Directors,"July 13, 2026"
+NVIDIA Corporation,NVDA,0001045810,2026-04-27,departure,Donald Robertson,NOT_FOUND,"May 4, 2026"
+NVIDIA Corporation,NVDA,0001045810,2026-04-27,appointment,Scott Gawel,NOT_FOUND,"May 4, 2026"
+NVIDIA Corporation,NVDA,0001045810,2026-03-06,NOT_FOUND,NOT_FOUND,NOT_FOUND,NOT_FOUND
+NVIDIA Corporation,NVDA,0001045810,2026-01-23,departure,Persis Drell,member of the Board of Directors,immediately
+JPMorgan Chase & Co.,JPM,0000019617,2026-06-25,appointment,Troy Rohrbaugh,NOT_FOUND,immediately
+JPMorgan Chase & Co.,JPM,0000019617,2026-06-25,departure,Marianne Lake,NOT_FOUND,NOT_FOUND
+JPMorgan Chase & Co.,JPM,0000019617,2026-01-22,NOT_FOUND,NOT_FOUND,NOT_FOUND,NOT_FOUND
+JPMorgan Chase & Co.,JPM,0000019617,2025-12-08,NOT_FOUND,NOT_FOUND,NOT_FOUND,NOT_FOUND
+Walmart Inc.,WMT,0000104169,2026-01-16,appointment,David Guggina,NOT_FOUND,"February 1, 2026"
+Walmart Inc.,WMT,0000104169,2026-01-16,appointment,John Furner,NOT_FOUND,NOT_FOUND
+Walmart Inc.,WMT,0000104169,2026-01-16,departure,Kathryn McLay,"Executive Vice President, President and Chief Executive Officer, Walmart International",NOT_FOUND
+Walmart Inc.,WMT,0000104169,2026-01-16,appointment,Christopher Nicholas,NOT_FOUND,NOT_FOUND
+Walmart Inc.,WMT,0000104169,2026-01-16,appointment,Latriece Watkins,NOT_FOUND,NOT_FOUND
+Walmart Inc.,WMT,0000104169,2026-01-08,appointment,Shishir Mehrotra,member of the Board of Directors,NOT_FOUND
+Walmart Inc.,WMT,0000104169,2025-11-14,appointment,John R. Furner,member of the Board of Directors,"February 1, 2026"
+Walmart Inc.,WMT,0000104169,2025-10-22,appointment,Dwayne Milum,NOT_FOUND,NOT_FOUND
