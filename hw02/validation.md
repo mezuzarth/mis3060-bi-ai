@@ -33,4 +33,29 @@ It also mentions taking a second look at whether there is any data missing from 
 
 3. Yes, as answered in the question above, Claude did mention the 101,597 null values. 
 
-4. 
+4. Claude did cite txn_date as a concern to revisit. This would matter for a time-series analysis because if it was stored as a plain text/string, calculating time differences or plotting a time series would fail. Other operation like sorting chronologically would also fail because string sorting compares dates character by character as text, not as actual points in time, until the column is converted to a real datetime type.
+
+5. The boxplot matches Claude's description well as all 6 transaction types are labeled on the y-axis. The advisory fee concern that Claude noted is noted by the massive cluster of outlier points, which also confirms the gap between the mean and median numbers.
+The histogram accurately reflects the explanation as well - right skewed distribution (long right hand tail) with the correct mean and median where the mean is to the right of the median because of the right skew.
+In the scatter plot, because the points are so dense and overlapping it is difficult to see the 6 different transaction types, so the visual doesn't communicate the same way the other charts do. 
+
+### 2C — Business Check & Cross-Validation 
+
+1. I would expect Deposit, Withdrawal, and Advisory Fee to have no security because none of these involve actually buying or selling a security, so there's nothing to record for `security_id`, `shares`, or `price`. Checking the counts: Deposit (35,981) + Advisory Fee (35,766) + Withdrawal (29,850) = 101,597, which matches exactly. This confirms the nulls aren't a data quality problem. tied directly to transaction type.
+
+2. A pattern like this likely represents a firm whose client base is actively growing their portfolios rather than withdrawing from them. It could reflect automated, regular contributions being invested, or new money coming into the firm. 
+
+3. If `txn_date` were left as a string, date arithmetic wouldn't be performed on it at all  because it wouldn't recognize these strings as points in time, so subtracting two dates to find the number of days between them would either error out or, worse, silently compute the wrong thing by comparing them as plain text. Even sorting the dates into chronological order would be unreliable unless the format was perfectly consistent/ 
+
+4. This is seems within a reasonable, moderately high-touch range. It depends on its model as boutique, high-net-worth firms often run closer to 50-75 clients per advisor for a more personalized relationship, while larger firms using team-based or more automated service models can run several hundred clients per advisor. 108 falls in between, which is normal if there is assistant staff or a team structure.
+
+5. One explanation could be that the transaction was actually a Sell (or a different type) but got mislabeled or had its sign flipped during entry or a system export, so it shows up as a "Buy" with a negative share count by mistake. On the other hand, the negative value represents an intentional reversal of a previous Buy transaction like a trade placed in error and then reversed, recorded as a negative "Buy". 
+
+To determine which is more likely, one could check whether these 836 rows have a corresponding positive Buy transaction with a matching (or very similar) absolute share count, the same client, and a nearby date wjhich if so, could indicate the reversal.
+
+6. Prompt A: 83,556
+Prompt B Total rows = 298,772; Buy count via subtraction = 83,556
+
+7. Yes both methods agree exactly on 83,556. 
+
+8. Verifying by subtraction is valuable because it's  independent of the direct filtering method. Direct filtering could give you a wrong number if there's a typo error like lowercase "buy" or something like a extra whitespace in the string that silently causes some Buy rows to be missed or miscounted. The subtraction approach doesn't rely on matching the string, but it only requires correctly identifying every row that belongs to one of the other five categories. Since the two methods don't share the same potential failure point, if a mistake exists in one approach it's very unlikely to produce the exact same error in the other.
