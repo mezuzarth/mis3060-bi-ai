@@ -23,25 +23,25 @@ fact_transactions,advisor_id,1-column,inconsistent key format,WARN,113866,0.3811
 fact_transactions,security_id,1-column,blank values,WARN,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
 fact_transactions,security_id,1-column,inconsistent key format,WARN,39316,0.131592,999.9 | 99.9 | 9.9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
 fact_transactions,shares x price vs amount,2-table,recompute amount,WARN,836,0.002798,,"197,175 comparable rows; 836 mismatch, of which 836 differ only in sign (sign convention?)."
-dim_advisor,,2-table,row count,INFO,25,1.0,,Read 25 rows x 7 cols; assignment says 25.
-dim_benchmark,,2-table,row count,INFO,8,1.0,,Read 8 rows x 4 cols; assignment says 8.
+dim_advisor,,2-table,row count,INFO,25,1.0,,Read 25 rows x 7 cols; expected 25.
+dim_benchmark,,2-table,row count,INFO,8,1.0,,Read 8 rows x 4 cols; expected 8.
 dim_client,risk_profile,1-column,blank values,INFO,76,0.030099,,Decide: legitimately empty (structure) or missing (defect)?
-dim_client,,2-table,row count,INFO,2525,1.0,,"Read 2,525 rows x 14 cols; assignment says 2525."
+dim_client,,2-table,row count,INFO,2525,1.0,,"Read 2,525 rows x 14 cols; expected 2,525."
 dim_client,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,2525,1.0,,match rate 100.00% of non-blank keys
-dim_date,,2-table,row count,INFO,1827,1.0,,"Read 1,827 rows x 12 cols; assignment says 1827."
+dim_date,,2-table,row count,INFO,1827,1.0,,"Read 1,827 rows x 12 cols; expected 1,827."
 dim_date,date,3-RI,calendar column used,INFO,1827,1.0,,"2020-01-01 to 2024-12-31, 1,827 distinct dates for 1,827 rows"
 dim_security,sector,1-column,blank values,INFO,219,0.438,,Decide: legitimately empty (structure) or missing (defect)?
 dim_security,expense_ratio_bps,1-column,blank values,INFO,281,0.562,,Decide: legitimately empty (structure) or missing (defect)?
-dim_security,,2-table,row count,INFO,500,1.0,,Read 500 rows x 8 cols; assignment says 500.
+dim_security,,2-table,row count,INFO,500,1.0,,Read 500 rows x 8 cols; expected 500.
 dim_security,benchmark_id,3-RI,FK -> dim_benchmark.benchmark_id,INFO,500,1.0,,match rate 100.00% of non-blank keys
-fact_fees,,2-table,row count,INFO,122197,1.0,,"Read 122,197 rows x 8 cols; assignment says 122197."
+fact_fees,,2-table,row count,INFO,122197,1.0,,"Read 122,197 rows x 8 cols; expected 122,197."
 fact_fees,client_id,3-RI,FK -> dim_client.client_id,INFO,122197,1.0,,match rate 100.00% of non-blank keys
 fact_fees,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,122197,1.0,,match rate 100.00% of non-blank keys
 fact_fees,fee_date,3-RI,date -> dim_date,INFO,122197,1.0,,match rate 100.00%
 fact_portfolio_snapshot,return_ytd,1-column,negative values,INFO,46167,0.356373,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
 fact_portfolio_snapshot,benchmark_return_ytd,1-column,negative values,INFO,37733,0.291269,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
 fact_portfolio_snapshot,active_alpha_ytd,1-column,negative values,INFO,58460,0.451265,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
-fact_portfolio_snapshot,,2-table,row count,INFO,129547,1.0,,"Read 129,547 rows x 13 cols; assignment says 129547."
+fact_portfolio_snapshot,,2-table,row count,INFO,129547,1.0,,"Read 129,547 rows x 13 cols; expected 129,547."
 fact_portfolio_snapshot,client_id,3-RI,FK -> dim_client.client_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
 fact_portfolio_snapshot,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
 fact_portfolio_snapshot,benchmark_id,3-RI,FK -> dim_benchmark.benchmark_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
@@ -49,7 +49,7 @@ fact_portfolio_snapshot,snapshot_date,3-RI,date -> dim_date,INFO,129547,1.0,,mat
 fact_transactions,shares,1-column,blank values,INFO,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
 fact_transactions,shares,1-column,negative values,INFO,836,0.002798,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
 fact_transactions,price,1-column,blank values,INFO,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
-fact_transactions,,2-table,row count,INFO,298772,1.0,,"Read 298,772 rows x 9 cols; assignment says 298772."
+fact_transactions,,2-table,row count,INFO,298772,1.0,,"Read 298,772 rows x 9 cols; expected 298,772."
 fact_transactions,client_id,3-RI,FK -> dim_client.client_id,INFO,298572,0.999331,,match rate 99.93% of non-blank keys
 fact_transactions,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,298772,1.0,,match rate 100.00% of non-blank keys
 fact_transactions,security_id,3-RI,FK -> dim_security.security_id,INFO,0,0.0,,match rate 0.00% of non-blank keys

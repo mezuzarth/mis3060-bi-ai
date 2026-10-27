@@ -26,10 +26,13 @@ from pathlib import Path
 
 import pandas as pd
 
+# Default table list = the eight files the assignment says to use (other files in the folder are ignored).
+# Override with --tables, or --tables all to profile every CSV in the folder. All checks below are generic.
 TABLES = [
     "dim_advisor", "dim_client", "dim_date", "dim_security", "dim_benchmark",
     "fact_fees", "fact_portfolio_snapshot", "fact_transactions",
 ]
+# Optional row counts published with the extract; tables not listed simply skip this comparison
 EXPECTED_ROWS = {
     "dim_advisor": 25, "dim_client": 2525, "dim_date": 1827, "dim_security": 500,
     "dim_benchmark": 8, "fact_fees": 122197, "fact_portfolio_snapshot": 129547,
@@ -279,7 +282,7 @@ def table_checks(table, df, pk, types):
     n = len(df)
     exp = EXPECTED_ROWS.get(table)
     add(table, "", "2-table", "row count", "INFO" if exp in (None, n) else "WARN", n, n, "",
-        f"Read {n:,} rows x {df.shape[1]} cols; assignment says {exp}.")
+        f"Read {n:,} rows x {df.shape[1]} cols" + (f"; expected {exp:,}." if exp else "; no expected count given."))
     bad_headers = [c for c in df.columns if c != c.strip()]
     if bad_headers:
         add(table, "", "2-table", "column header whitespace", "WARN", 0, n, repr(bad_headers))
@@ -462,18 +465,24 @@ def main():
     ap.add_argument("--data-dir", default="Wildcat Capital")
     ap.add_argument("--stage", default="raw")
     ap.add_argument("--out-dir", default="reports")
+    ap.add_argument("--tables", default=",".join(TABLES),
+                    help="comma-separated table names to profile, or 'all' for every *.csv in --data-dir "
+                         "(default: the eight assignment tables)")
     args = ap.parse_args()
 
     data, out = Path(args.data_dir), Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    tables = {}
-    for t in TABLES:
-        p = data / f"{t}.csv"
-        if not p.exists():
-            print(f"!! missing {p} - skipped")
-            continue
-        tables[t] = pd.read_csv(p, dtype=str, keep_default_na=False, encoding="utf-8-sig")
+    if args.tables == "all":
+        names = sorted(p.stem for p in data.glob("*.csv"))
+    else:
+        names = [t.strip() for t in args.tables.split(",") if t.strip()]
+    missing = [t for t in names if not (data / f"{t}.csv").exists()]
+    if missing or not names:
+        # Fail fast: a profile of a partial dataset would look complete and mislead the decision log
+        raise SystemExit(f"ERROR: missing input file(s) in {data}/: {missing or 'no tables found'}. Nothing written.")
+    tables = {t: pd.read_csv(data / f"{t}.csv", dtype=str, keep_default_na=False, encoding="utf-8-sig")
+              for t in names}
 
     profile_rows, types, pks = [], {}, {}
     for t, df in tables.items():
