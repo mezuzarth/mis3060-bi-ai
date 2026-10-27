@@ -1,0 +1,3 @@
+﻿!reports/*.csv
+!data/clean/*.csv
+!data/audit/*.csv

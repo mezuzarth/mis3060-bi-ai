@@ -1,0 +1,57 @@
+table,column,check_group,check,severity,rows_affected,pct_of_rows,example,detail
+fact_transactions,client_id,3-RI,orphan FK (not in dim_client),ERROR,200,0.000669,'3191' | '3017' | '3058' | '2974' | '3131',"200 distinct orphan keys; 0 rows would match after trimming/case/leading-zero normalisation (format defect, not missing master data)."
+fact_transactions,security_id,3-RI,orphan FK (not in dim_security),ERROR,197175,0.659951,'447.0' | '430.0' | '74.0' | '128.0' | '405.0',"500 distinct orphan keys; 197,175 rows would match after trimming/case/leading-zero normalisation (format defect, not missing master data)."
+dim_advisor,advisor_id,1-column,inconsistent key format,WARN,9,0.36,99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+dim_advisor,certifications,1-column,null-like text tokens,WARN,6,0.24,'None' (x6),Text like 'None'/'N/A' standing in for missing; default read_csv would silently turn it into NaN.
+dim_client,client_id,1-column,inconsistent key format,WARN,999,0.395644,9999 | 999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+dim_client,advisor_id,1-column,inconsistent key format,WARN,952,0.37703,99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+dim_client,"first_name,last_name",2-table,possible same entity under two IDs,WARN,107,0.042376,7 | 24 | 64 | 93 | 107 | 113,
+dim_date,date_id,1-column,inconsistent key format,WARN,927,0.507389,999 | 9999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+dim_date,month_name,2-table,possible same entity under two IDs,WARN,1827,1.0,1 | 2 | 3 | 4 | 5 | 6,
+dim_security,security_id,1-column,inconsistent key format,WARN,99,0.198,999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_fees,fee_id,1-column,inconsistent key format,WARN,32197,0.263484,99999 | 999999 | 9999 | 999 | 99,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_fees,client_id,1-column,inconsistent key format,WARN,49338,0.403758,9999 | 999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_fees,advisor_id,1-column,inconsistent key format,WARN,45562,0.372857,99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_portfolio_snapshot,snapshot_id,1-column,inconsistent key format,WARN,39547,0.305271,99999 | 999999 | 9999 | 999 | 99,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_portfolio_snapshot,client_id,1-column,inconsistent key format,WARN,52291,0.403645,9999 | 999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_portfolio_snapshot,advisor_id,1-column,inconsistent key format,WARN,48254,0.372483,99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_portfolio_snapshot,return_ytd,1-column,mixed formats,WARN,435,0.003358,'-9.5e-05' (x4) | '1.3e-05' (x3) | '-0.64%' (x3) | '1e-06' (x3) | '3.5e-05' (x3),Formats found: number:129112 | percent:300 | sci:135. Majority format = number.
+fact_portfolio_snapshot,active_alpha_ytd,1-column,mixed formats,WARN,756,0.005836,'2e-05' (x9) | '4.9e-05' (x9) | '3.1e-05' (x8) | '-2e-05' (x8) | '-1e-05' (x8),Formats found: number:128791 | sci:756. Majority format = number.
+fact_transactions,txn_id,1-column,inconsistent key format,WARN,99999,0.3347,999999 | 99999 | 9999 | 999 | 99,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_transactions,client_id,1-column,inconsistent key format,WARN,119207,0.39899,9999 | 999 | 99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_transactions,advisor_id,1-column,inconsistent key format,WARN,113866,0.381113,99 | 9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_transactions,security_id,1-column,blank values,WARN,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
+fact_transactions,security_id,1-column,inconsistent key format,WARN,39316,0.131592,999.9 | 99.9 | 9.9,"Different shapes in one key column (e.g. lost leading zeros, '45.0'). Will break joins."
+fact_transactions,shares x price vs amount,2-table,recompute amount,WARN,836,0.002798,,"197,175 comparable rows; 836 mismatch, of which 836 differ only in sign (sign convention?)."
+dim_advisor,,2-table,row count,INFO,25,1.0,,Read 25 rows x 7 cols; assignment says 25.
+dim_benchmark,,2-table,row count,INFO,8,1.0,,Read 8 rows x 4 cols; assignment says 8.
+dim_client,risk_profile,1-column,blank values,INFO,76,0.030099,,Decide: legitimately empty (structure) or missing (defect)?
+dim_client,,2-table,row count,INFO,2525,1.0,,"Read 2,525 rows x 14 cols; assignment says 2525."
+dim_client,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,2525,1.0,,match rate 100.00% of non-blank keys
+dim_date,,2-table,row count,INFO,1827,1.0,,"Read 1,827 rows x 12 cols; assignment says 1827."
+dim_date,date,3-RI,calendar column used,INFO,1827,1.0,,"2020-01-01 to 2024-12-31, 1,827 distinct dates for 1,827 rows"
+dim_security,sector,1-column,blank values,INFO,219,0.438,,Decide: legitimately empty (structure) or missing (defect)?
+dim_security,expense_ratio_bps,1-column,blank values,INFO,281,0.562,,Decide: legitimately empty (structure) or missing (defect)?
+dim_security,,2-table,row count,INFO,500,1.0,,Read 500 rows x 8 cols; assignment says 500.
+dim_security,benchmark_id,3-RI,FK -> dim_benchmark.benchmark_id,INFO,500,1.0,,match rate 100.00% of non-blank keys
+fact_fees,,2-table,row count,INFO,122197,1.0,,"Read 122,197 rows x 8 cols; assignment says 122197."
+fact_fees,client_id,3-RI,FK -> dim_client.client_id,INFO,122197,1.0,,match rate 100.00% of non-blank keys
+fact_fees,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,122197,1.0,,match rate 100.00% of non-blank keys
+fact_fees,fee_date,3-RI,date -> dim_date,INFO,122197,1.0,,match rate 100.00%
+fact_portfolio_snapshot,return_ytd,1-column,negative values,INFO,46167,0.356373,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
+fact_portfolio_snapshot,benchmark_return_ytd,1-column,negative values,INFO,37733,0.291269,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
+fact_portfolio_snapshot,active_alpha_ytd,1-column,negative values,INFO,58460,0.451265,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
+fact_portfolio_snapshot,,2-table,row count,INFO,129547,1.0,,"Read 129,547 rows x 13 cols; assignment says 129547."
+fact_portfolio_snapshot,client_id,3-RI,FK -> dim_client.client_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
+fact_portfolio_snapshot,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
+fact_portfolio_snapshot,benchmark_id,3-RI,FK -> dim_benchmark.benchmark_id,INFO,129547,1.0,,match rate 100.00% of non-blank keys
+fact_portfolio_snapshot,snapshot_date,3-RI,date -> dim_date,INFO,129547,1.0,,match rate 100.00%
+fact_transactions,shares,1-column,blank values,INFO,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
+fact_transactions,shares,1-column,negative values,INFO,836,0.002798,,"Decide the sign rule for this column (legit e.g. withdrawals/losses, or an error?)."
+fact_transactions,price,1-column,blank values,INFO,101597,0.340049,,Decide: legitimately empty (structure) or missing (defect)?
+fact_transactions,,2-table,row count,INFO,298772,1.0,,"Read 298,772 rows x 9 cols; assignment says 298772."
+fact_transactions,client_id,3-RI,FK -> dim_client.client_id,INFO,298572,0.999331,,match rate 99.93% of non-blank keys
+fact_transactions,advisor_id,3-RI,FK -> dim_advisor.advisor_id,INFO,298772,1.0,,match rate 100.00% of non-blank keys
+fact_transactions,security_id,3-RI,FK -> dim_security.security_id,INFO,0,0.0,,match rate 0.00% of non-blank keys
+fact_transactions,security_id,3-RI,blank foreign key,INFO,101597,0.340049,,Decide if legit (e.g. cash rows with no security) or missing.
+fact_transactions,txn_date,3-RI,date -> dim_date,INFO,298772,1.0,,match rate 100.00%
