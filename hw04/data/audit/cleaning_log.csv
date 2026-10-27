@@ -1,0 +1,19 @@
+table,issue,action,rows_affected,note
+fact_transactions,security_id stored as decimal ('447.0'),convert,197175,FK match 0.00% -> 100.00%
+dim_client,state mixes codes and full names,standardize,78,distinct values 27 -> 20
+fact_portfolio_snapshot,return_ytd stored as % string,convert,300,reconciled: alpha identity 99.7684% -> 100.0000%
+fact_portfolio_snapshot,return_ytd in scientific notation,standardize,135,numeric value identical
+fact_portfolio_snapshot,active_alpha_ytd in scientific notation,standardize,756,numeric value identical
+fact_transactions,negative shares on Buy,standardize (absolute value),836,reconciled: |shares| x price = amount for 100% of affected rows
+fact_transactions,orphan client_id,quarantine,200,"amount $10,888,495.37 removed from clean data"
+dim_client,risk_profile blank [D6],flag (risk_profile_missing_flag),76,left blank: a suitability rating must not be invented
+fact_portfolio_snapshot,implausible YTD return/alpha [D14],flag (return_outlier_flag),632,"|return|>1.5: 622, |alpha|>1.5: 611; values unchanged"
+fact_portfolio_snapshot,aum at 1000.00 system floor [D15],flag (aum_floor_flag),420,value unchanged
+fact_fees,aum_basis at 1000.00 system floor [D15],flag (aum_floor_flag),386,value unchanged
+fact_transactions,Buy/Sell dated on a non-trading day [D17],flag (non_trading_day_trade_flag),40630,date unchanged
+fact_transactions,blank security_id/shares/price [D4],leave as is,0,"verified: blank on exactly the 101,528 cash rows (Deposit/Withdrawal/Advisory Fee)"
+dim_security,blank sector / expense_ratio_bps [D9],leave as is,0,"verified: sector blank on exactly 219 ETFs, expense ratio blank on exactly 281 stocks"
+fact_fees,dated before client_since [D16],leave as is,0,verified: all 858 such rows are in the client's first month (monthly grain)
+fact_portfolio_snapshot,dated before client_since [D16],leave as is,0,verified: all 930 such rows are in the client's first month (monthly grain)
+dim_advisor,certifications = 'None' [D11],leave as is,0,"6 advisors with no certifications; real value, not missing"
+fact_transactions,Advisory Fee debits vs fact_fees [D19],leave as is,0,cannot be reconciled at month or quarter grain; fact_fees is the system of record
