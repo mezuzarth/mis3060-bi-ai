@@ -40,7 +40,7 @@ python scripts/03_validate.py                                       # validate r
 ## Results at a glance
 - Profiler found all **13 relationships** (10 ID-based, 3 date) by naming convention, with no per-table hard-coding
 - **199,280** values changed (logged), **200** rows quarantined, **5** flag columns added; raw = clean + quarantined for all 8 tables
-- Clean data: **100%** referential match on all 13 relationships, **43/43** business rules pass, **6/6** reconciliations at 100%
+- Clean data: **100%** referential match on all 13 relationships, **44/44** business rules pass, **6/6** reconciliations at 100%
 
 ## Claude Code review findings
 *(Fill in from your Claude Code reviews before each commit: what it flagged and what you did.)*

@@ -39,6 +39,7 @@ raw,fact_portfolio_snapshot,account_type in allowed list,129547,129547,0,1.0
 raw,fact_transactions,txn_type in allowed list,298772,298772,0,1.0
 raw,fact_transactions,amount > 0,298772,298772,0,1.0
 raw,fact_transactions,shares > 0 on Buy/Sell/Dividend (sign rule),197175,196339,836,0.99576
+raw,fact_transactions,security_id present on Buy/Sell/Dividend,197175,197175,0,1.0
 raw,fact_transactions,price > 0 on Buy/Sell/Dividend,197175,197175,0,1.0
 raw,fact_transactions,security/shares/price blank on cash types,101597,101597,0,1.0
 raw,fact_transactions,txn_date within 2020-2024,298772,298772,0,1.0
@@ -82,6 +83,7 @@ clean,fact_portfolio_snapshot,account_type in allowed list,129547,129547,0,1.0
 clean,fact_transactions,txn_type in allowed list,298572,298572,0,1.0
 clean,fact_transactions,amount > 0,298572,298572,0,1.0
 clean,fact_transactions,shares > 0 on Buy/Sell/Dividend (sign rule),197044,197044,0,1.0
+clean,fact_transactions,security_id present on Buy/Sell/Dividend,197044,197044,0,1.0
 clean,fact_transactions,price > 0 on Buy/Sell/Dividend,197044,197044,0,1.0
 clean,fact_transactions,security/shares/price blank on cash types,101528,101528,0,1.0
 clean,fact_transactions,txn_date within 2020-2024,298572,298572,0,1.0
