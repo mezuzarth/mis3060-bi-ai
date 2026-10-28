@@ -85,10 +85,17 @@ RAW_ROWS = {t: len(df) for t, df in T.items()}
 RAW_COLS = {t: list(df.columns) for t, df in T.items()}
 adv, cli, dd, sec = T["dim_advisor"], T["dim_client"], T["dim_date"], T["dim_security"]
 fees, snap, tx = T["fact_fees"], T["fact_portfolio_snapshot"], T["fact_transactions"]
+RAW_TX = T["fact_transactions"].copy()                   # untouched copy, used for the quarantine file
+RAW_TX.insert(0, "raw_line_number", RAW_TX.index + 2)   # line in the raw CSV (+1 header, +1 for 1-based)
 print("Loaded raw rows:", RAW_ROWS)
 
 # ------------------------------------------------------------------ step 0
 header(0, "Guard: stray whitespace in any cell (profile found none)")
+def ws_cells():
+    return sum(int((df[c] != df[c].str.strip()).sum()) for df in T.values() for c in df.columns)
+
+
+ws_before = ws_cells()
 total_ws = 0
 for t, df in T.items():
     for c in df.columns:
@@ -97,8 +104,9 @@ for t, df in T.items():
             change(t, df, c, m, df.loc[m, c].str.strip())
             log(t, f"whitespace in {c}", "standardize (trim)", m.sum())
             total_ws += int(m.sum())
-print(f"cells trimmed: {total_ws}")
-assert all((df[c] == df[c].str.strip()).all() for df in T.values() for c in df.columns)
+ws_after = ws_cells()
+print(f"cells with stray whitespace: before {ws_before} -> after {ws_after} | cells trimmed: {total_ws}")
+assert ws_after == 0 and total_ws == ws_before
 
 # ------------------------------------------------------------------ step 1  (D1)
 header(1, "fact_transactions.security_id '447.0' -> '447'  [D1]")
@@ -124,7 +132,9 @@ assert not unmapped, f"state values with no mapping: {unmapped}"
 assert set(cli.state[~is_code].map(STATE_MAP)) <= codes_before, "a mapped code is not already in use"
 n_before = cli.state.nunique()
 m = cli.state.isin(STATE_MAP)
+old_state = cli.loc[m, "state"].copy()
 change("dim_client", cli, "state", m, cli.loc[m, "state"].map(STATE_MAP))
+assert (cli.loc[m, "state"] == old_state.map(STATE_MAP)).all(), "a row was not mapped to its own code"
 print(f"rows changed: {m.sum()} | distinct states: {n_before} -> {cli.state.nunique()}")
 assert cli.state.str.fullmatch(r"[A-Z]{2}").all()
 assert set(cli.state) == codes_before
@@ -183,11 +193,12 @@ log("fact_transactions", "negative shares on Buy", "standardize (absolute value)
 header(6, "Quarantine transactions whose client_id is not in dim_client  [D3]")
 dim_cli = set(cli.client_id)
 m = ~tx.client_id.isin(dim_cli)
-q = tx[m].copy()
-q.insert(0, "raw_line_number", q.index + 2)          # +2: header line, 1-based numbering
+# No row has been removed or reordered yet, so tx's index still points at the raw CSV row (asserted)
+assert tx.index.equals(RAW_TX.index) and (tx.txn_id == RAW_TX.txn_id).all(), "row order changed before quarantine"
+q = RAW_TX.loc[m[m].index].copy()                     # quarantine the ORIGINAL raw values
 ids = num(q.client_id)
 q["quarantine_reason"] = (f"client_id not in dim_client (orphan FK, ids {ids.min():.0f}-{ids.max():.0f}); "
-                          "values shown after steps 1 and 5")
+                          "values are exactly as in the raw file")
 QUARANTINE["fact_transactions_orphan_client"] = ("fact_transactions", q)
 amt = num(q.amount).sum()
 tx = tx[~m].copy()
@@ -248,7 +259,11 @@ for t, df, dc in [("fact_fees", fees, "fee_date"), ("fact_portfolio_snapshot", s
     assert (df.loc[early, dc].str[:7] == s[early].str[:7]).all(), f"{t}: a row is in a month before client_since"
     log(t, "dated before client_since [D16]", "leave as is", 0,
         f"verified: all {early.sum()} such rows are in the client's first month (monthly grain)")
-assert (tx.txn_date >= tx.client_id.map(since)).all()
+# Transactions are DAILY grain, so the same-month allowance above does not apply: no trade may precede client_since
+early_tx = int((tx.txn_date < tx.client_id.map(since)).sum())
+assert early_tx == 0, f"{early_tx} transactions dated before client_since"
+log("fact_transactions", "dated before client_since [D16]", "leave as is", 0,
+    "verified: 0 transactions before client_since (daily grain, so no same-month allowance)")
 
 log("dim_advisor", "certifications = 'None' [D11]", "leave as is", 0,
     f"{(adv.certifications == 'None').sum()} advisors with no certifications; real value, not missing")

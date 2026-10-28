@@ -1,0 +1,13 @@
+stage,scope,reconciliation,rows_compared,rows_matched,match_rate
+raw,fact_fees,amount = aum_basis x bps / 10000 / 12,122197,122197,1.0
+raw,fact_fees vs fact_portfolio_snapshot,aum_basis = snapshot aum (same client-month),122197,122197,1.0
+raw,fact_portfolio_snapshot,active_alpha = return_ytd - benchmark_return_ytd,129547,129247,0.997684
+raw,fact_transactions,shares x price = amount (Buy/Sell/Dividend),197175,196339,0.99576
+raw,fact_portfolio_snapshot vs dim_client,benchmark_id matches client risk_profile,125605,125605,1.0
+raw,facts vs dim_client,fact advisor_id = client's advisor,550316,550316,1.0
+clean,fact_fees,amount = aum_basis x bps / 10000 / 12,122197,122197,1.0
+clean,fact_fees vs fact_portfolio_snapshot,aum_basis = snapshot aum (same client-month),122197,122197,1.0
+clean,fact_portfolio_snapshot,active_alpha = return_ytd - benchmark_return_ytd,129547,129547,1.0
+clean,fact_transactions,shares x price = amount (Buy/Sell/Dividend),197044,197044,1.0
+clean,fact_portfolio_snapshot vs dim_client,benchmark_id matches client risk_profile,125605,125605,1.0
+clean,facts vs dim_client,fact advisor_id = client's advisor,550316,550316,1.0

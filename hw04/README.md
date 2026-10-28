@@ -47,8 +47,13 @@ python scripts/03_validate.py                                       # validate r
 
 | Script | What Claude Code flagged | What I did |
 |---|---|---|
-| 01_profile.py | | |
-| 02_clean.py | | |
+| 01_profile.py | (High) A missing input CSV was printed and skipped, so the script could write a profile of a partial dataset that looked complete | Fixed: the script now stops with an error and writes nothing if any expected file is missing |
+| 01_profile.py | (Medium) Table list and expected row counts were hard-coded to this extract | Partly fixed: the table list is now a --tables option (default = the 8 assignment files; all = every CSV in the folder), and row counts are optional. The checks themselves were already generic |
+| 01_profile.py | (Low) Primary and foreign keys are detected from naming conventions, so unconventional names could be missed | Accepted: it found exactly the 13 relationships the assignment specifies; noted as a limitation, since other naming would need a hand-written mapping |
+| 02_clean.py |(High) txn_date >= client_since assert seemed stricter than D16’s same-month rule |Not a bug: D16’s same-month allowance applies to the monthly fee/snapshot tables; transactions are daily and 0 precede client_since. Added a comment and a cleaning-log entry to make this explicit |
+| 02_clean.py |(Medium) Quarantine raw_line_number was derived from the DataFrame index, not proven to match the raw file |Added an assert that row order is unchanged before quarantine, and the quarantine file now holds the untouched raw values |
+| 02_clean.py |(Medium) Step 0 (whitespace) printed only a count, not a before/after check |Fixed: prints before/after counts and asserts both |
+| 02_clean.py | (Low) State assert checked the final set of codes, not each row’s mapping|Fixed: asserts every changed row equals the mapping of its own original value |
 | 03_validate.py | | |
 
 ## Commits
