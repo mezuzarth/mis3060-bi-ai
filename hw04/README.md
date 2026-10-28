@@ -62,4 +62,12 @@ python scripts/03_validate.py                                       # validate r
 | 03_validate.py |(Low) IQR meaning is narrative only |Accepted: the assignment asks for that sentence; IQR flags are never used to change data|
 
 ## Commits
-One or more per part (A–E), each message stating specifically what changed.
+## Commits
+- b352f51 HW4 Part A: generic profiler (4 check groups), finds 10 ID + 3 date relationships; profile_raw + dq_summary_raw
+- b46ad76 HW4 Part A: add profile_raw and dq_summary_raw reports; allow required CSVs in hw04/.gitignore
+- 6e67b3f HW4 Part B: decision log, 21 entries; 6 defects fixed/quarantined, 5 flags, 10 legit structures verified
+- 74eafe2 HW4 Part C: clean 8 tables - 200 orphan txns quarantined, 199,280 value changes logged, 5 flag columns; raw = clean + quarantined
+- 06427c0 HW4 Part A: Claude Code review fixes - fail fast on missing input files, --tables option
+- 971e3dd HW4 Part C: Claude Code review fixes - raw-value quarantine with verified line numbers, before/after on every step
+- c0e3490 HW4 Part D: Claude Code review fixes - security_id rule (44 rules), fk_relationships_checked, optional key normalization, metric definitions
+- e9db513 HW4 Part D: Claude Code review fixes - security_id rule (44 rules), fk_relationships_checked, optional key normalization; report updated to match
