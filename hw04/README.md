@@ -54,7 +54,12 @@ python scripts/03_validate.py                                       # validate r
 | 02_clean.py |(Medium) Quarantine raw_line_number was derived from the DataFrame index, not proven to match the raw file |Added an assert that row order is unchanged before quarantine, and the quarantine file now holds the untouched raw values |
 | 02_clean.py |(Medium) Step 0 (whitespace) printed only a count, not a before/after check |Fixed: prints before/after counts and asserts both |
 | 02_clean.py | (Low) State assert checked the final set of codes, not each row’s mapping|Fixed: asserts every changed row equals the mapping of its own original value |
-| 03_validate.py | | |
+| 03_validate.py | (High) pct_referential_match blank for some tables|Not a bug: blank only for tables with no foreign keys, where it doesn’t apply. Added fk_relationships_checked and documented the metric definitions |
+| 03_validate.py |(High) Type validity excludes blanks |Intentional: blanks are measured by completeness, so they aren’t counted twice. Documented in the script header|
+| 03_validate.py |(Medium) No rule requiring security_id on Buy/Sell/Dividend| Fixed: added the rule (now 44 rules)|
+| 03_validate.py | (Medium) RI function only does exact text matching|Exact matching kept as the default (matches BI joins, exposes format defects); added an optional normalize= argument for reuse in Assignment 5 |
+| 03_validate.py |(Low) Pooled rule-pass rate is hard to interpret| Accepted: per-rule detail is in rule_results.csv; definition documented|
+| 03_validate.py |(Low) IQR meaning is narrative only |Accepted: the assignment asks for that sentence; IQR flags are never used to change data|
 
 ## Commits
 One or more per part (A–E), each message stating specifically what changed.
