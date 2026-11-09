@@ -316,14 +316,8 @@ Zero or negative AUM. A zero or negative balance is not BLANK, so it stays in th
 
 ---
 
-## Prompt 2 (Test / Debug), only if needed
+## Test / Debug / Review
 
-*If the measure errored, or a number disagreed with `reports/measure_reconciliation.csv`, paste the error or the two numbers here, ask Claude why, and paste its reply. If nothing went wrong, use this follow-up to test one of Claude's claims instead, for example:*
-
-> Your measure ranks clients with `[Ending AUM]` inside TOPN. At the grand total, a client who left in 2023 has no December 2024 row. What does `[Ending AUM]` return for that client inside TOPN, and could that client wrongly take a top-10 slot?
-
-## Claude's response 2
-
-```
-PASTE HERE
-```
+No second prompt was needed. Claude's measure was valid on the first try and matched pandas on every slice (`claude/verification.md`). I tested Claude's own claims in Power BI and pandas instead of asking a follow-up question:
+- Departed clients' stale balances: real in principle, but no effect on this data. A side-by-side DAX query gave 0.0615892675 for both Claude's version and the simpler hint version.
+- Zero or negative AUM: doesn't apply. The minimum `aum` is $1,000.

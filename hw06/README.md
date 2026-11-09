@@ -70,10 +70,23 @@ All 91 rows matched on the first run, so no measure or pandas calculation needed
 - **Claude Desktop** drafted measure 11, `Top 10 Client Share`, from my exported metadata (`claude/dax_session.md`). It ran as written and reconciled on every slice. I tested its claims in Power BI and pandas (`claude/verification.md`).
 - **Claude Code review** of the scripts before committing:
 
-| What Claude Code flagged | What I did |
-|---|---|
-| [FILL IN] | [FILL IN] |
-| [FILL IN] | [FILL IN] |
+Claude Code confirmed that the pandas side never reads Power BI values, that the last-snapshot, SAMEPERIODLASTYEAR/DATEADD and suspect-filter logic match the DAX, and it re-ran the reconciliation (91/91). Its findings and what I did:
+
+| # | What Claude Code flagged | What I did |
+|---|---|---|
+| 1 | Top 10: pandas ranks clients present on the last date, but `TOPN(10, VALUES(client_id), [Ending AUM])` ranks each client on its *own* last balance (including the 175 who left). | **No change needed; finding based on the wrong DAX.** Claude Code assumed the assignment's hint version. My final measure (Claude Desktop's) ranks every client at one fixed `LastSnap` date and drops blanks, which is exactly the pandas logic. I also showed in DAX query view that the hint version gives the same 0.0615892675 on this data (`claude/verification.md`, edge case 1). |
+| 2 | Ties: `TOPN` keeps tied rows, `nlargest(10)` doesn't. | **Fixed.** My DAX breaks ties with `dim_client[client_id] ASC`, so pandas now sorts by `aum` descending then `client_id` ascending and takes 10, mirroring it exactly. No tie exists at 10th place today. |
+| 3 | `TOL_RATIO = 0.0001` is far stricter on bps (~43) than on a decimal ratio. | **Kept on purpose, documented in the code.** 0.0001 is the assignment's ratio tolerance, the export writes 10 decimals so it passes, and a stricter test can only catch more. |
+| 4 | `to_number` crashes on values like `$12.73B`, `(1,234.00)` or a decimal comma. | **Fixed.** Accounting negatives and Unicode minus are handled; anything unreadable (including a decimal comma) marks that row a mismatch and prints a message instead of stopping the run. Tested with `$204.68M`. |
+| 5 | pandas returns 0 for Total Fees / Net Flows on an empty slice, DAX returns BLANK. | **Fixed.** Both now return blank (NaN) when there are no rows, mirroring DAX (BLANK − BLANK = BLANK). |
+| 6 | The grand total uses `dim_date`'s range, while DAX's has no filter. | **Fixed.** Added an `assert` that every snapshot, fee and transaction date lies inside `dim_date`; it passes. |
+| 7 | `find_csv` could silently pick the wrong file among several downloads. | **Fixed.** It prefers the exact name, stops if there are several `(n)` copies, and prints the file it uses. |
+| 8 | Duplicate `(measure, slice)` rows in `powerbi_values.csv` would be silently duplicated by the merge. | **Fixed.** The script stops and lists duplicates (tested). Tier slices from data vs `VALUES(client_tier)`: left as is, since a difference already shows up as a one-sided row. |
+| 9 | 02 (d) hard-codes tier names and rebuilds its own logic. | **Fixed.** Tiers come from the data with an assert, and (d) is cross-checked against `rec.measures()`, the exact function reconciled to Power BI. |
+| 10 | 02 (b) assumes one fee row per client-month. | **Fixed.** Added an `assert`; it passes (0 duplicates). |
+| 11 | 02 doesn't create `reports/` and has no `__main__` guard. | **Fixed.** Both added. |
+
+After the fixes I re-ran both scripts: **91/91 rows still match** with identical values, and the Part C numbers are unchanged.
 
 ## Notes
 - **Model:** 12 relationships (the 11 fact → dimension relationships plus `dim_security → dim_benchmark`), all many-to-one and single direction. INFO.VIEW.RELATIONSHIPS shows a 13th, a hidden auto date/time link on `dim_client[client_since]`, which no measure uses.

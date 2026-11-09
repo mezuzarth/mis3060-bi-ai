@@ -42,12 +42,12 @@ All nine values agree with pandas to 10 decimal places. The grand total equals t
 
 | measure | slice | powerbi_value | pandas_value | match |
 |---|---|---:|---:|---|
-| Top 10 Client Share | Total | [from CSV] | 0.0615892675 | [TRUE] |
-| Top 10 Client Share | Tier=HNW\|2024 | [from CSV] | 0.0313967475 | [TRUE] |
-| Top 10 Client Share | Tier=Retail\|2024 | [from CSV] | 0.0183482183 | [TRUE] |
-| Top 10 Client Share | Tier=UHNW\|2024 | [from CSV] | 0.0812642675 | [TRUE] |
+| Top 10 Client Share | Total | 0.0615892675 | 0.0615892675 | TRUE |
+| Top 10 Client Share | Tier=HNW\|2024 | 0.0313967475 | 0.0313967475 | TRUE |
+| Top 10 Client Share | Tier=Retail\|2024 | 0.0183482183 | 0.0183482183 | TRUE |
+| Top 10 Client Share | Tier=UHNW\|2024 | 0.0812642675 | 0.0812642675 | TRUE |
 
-The pandas side is independent of Power BI. It takes the snapshot rows on the slice's last date, ranks clients with `groupby("client_id")["aum"].sum().nlargest(10)`, and divides by the slice's total AUM. No TOPN, and nothing read from Power BI.
+All four differences are below 0.00000000004, far inside the 0.0001 ratio tolerance. The pandas side is independent of Power BI. It takes the snapshot rows on the slice's last date, ranks clients with `groupby("client_id")["aum"].sum().nlargest(10)`, and divides by the slice's total AUM. No TOPN, and nothing read from Power BI.
 
 ## 3. Edge cases checked
 

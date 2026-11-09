@@ -36,6 +36,9 @@ CURRENCY = {
 COUNT = {"Ending Clients"}
 TEXT = {"Alpha Signal"}
 TOL_CURRENCY = 0.01
+# The assignment sets 0.0001 for ratios. Fee Yield is stored in bps (~43), so 0.0001 bps is
+# stricter than the same tolerance on a decimal ratio. Kept on purpose: the export query writes
+# 10 decimals, so the strict test still passes, and a stricter check can only hide less.
 TOL_RATIO = 0.0001   # applies to %, ratios and bps
 
 
@@ -45,9 +48,17 @@ def find_csv(stem: str) -> Path:
     folders = [Path(os.environ["WILDCAT_DATA_DIR"])] if "WILDCAT_DATA_DIR" in os.environ else []
     folders += [HW_DIR, HW_DIR / "data", HW_DIR.parent / "data"]
     for folder in folders:
-        hits = sorted(folder.glob(f"{stem}*.csv")) if folder.exists() else []
-        hits = [h for h in hits if h.stem == stem or h.stem.startswith(stem + " (")]
+        if not folder.exists():
+            continue
+        exact = folder / f"{stem}.csv"
+        if exact.exists():                       # prefer the exact file name
+            print(f"  using {exact}")
+            return exact
+        hits = [h for h in folder.glob(f"{stem} (*).csv")]
+        if len(hits) > 1:                        # never guess between several downloads
+            sys.exit(f"Several candidates for {stem}.csv in {folder}: {[h.name for h in hits]} - keep one")
         if hits:
+            print(f"  using {hits[0]}")
             return hits[0]
     sys.exit(f"Could not find {stem}.csv - put the Wildcat Capital Clean CSVs in hw06/ or hw06/data/")
 
@@ -58,6 +69,12 @@ def load():
     txns = pd.read_csv(find_csv("fact_transactions"), parse_dates=["txn_date"])
     clients = pd.read_csv(find_csv("dim_client"), usecols=["client_id", "client_tier"])
     dates = pd.read_csv(find_csv("dim_date"), parse_dates=["date"])
+
+    # The grand total in pandas is "all of dim_date"; in DAX it is "no filter".
+    # Those are the same only if every fact date falls inside dim_date.
+    d0, d1 = dates["date"].min(), dates["date"].max()
+    for df, col in ((snap, "snapshot_date"), (fees, "fee_date"), (txns, "txn_date")):
+        assert df[col].between(d0, d1).all(), f"{col} has dates outside dim_date"
 
     # Attach the dimension attributes the slices filter on (like the model's relationships)
     for df in (snap, fees, txns):
@@ -114,9 +131,12 @@ def measures(snap, fees, txns, ctx):
     pm = last_snapshot(snap, ctx.shifted(months=-1))
     ending_aum_pm = pm["aum"].sum() if not pm.empty else np.nan
 
-    total_fees = f["amount"].sum()
-    net_flows = (t.loc[t["txn_type"] == "Deposit", "amount"].sum()
-                 - t.loc[t["txn_type"] == "Withdrawal", "amount"].sum())
+    # DAX SUM over no rows is BLANK, not 0 - mirror that so empty slices don't false-mismatch
+    total_fees = f["amount"].sum() if not f.empty else np.nan
+    dep = t.loc[t["txn_type"] == "Deposit", "amount"]
+    wd = t.loc[t["txn_type"] == "Withdrawal", "amount"]
+    # BLANK - BLANK = BLANK in DAX; BLANK on one side behaves like 0
+    net_flows = np.nan if (dep.empty and wd.empty) else dep.sum() - wd.sum()
     sum_aum = s["aum"].sum()
 
     clean = last[last["is_return_suspect"] == 0]
@@ -130,8 +150,16 @@ def measures(snap, fees, txns, ctx):
     else:
         signal = "In line"
 
-    # Top 10: rank clients by their balance at the context's last snapshot date
-    top10 = last.groupby("client_id")["aum"].sum().nlargest(10).sum() if not last.empty else np.nan
+    # Top 10: mirrors the final DAX measure (Claude Desktop's version). Every client is ranked
+    # at the SAME date - the context's last snapshot - so departed clients (no row that day)
+    # are out, and ties are broken by client_id ascending, exactly like
+    # TOPN ( 10, ..., [@AUM], DESC, dim_client[client_id], ASC )
+    if last.empty:
+        top10 = np.nan
+    else:
+        by_client = last.groupby("client_id", as_index=False)["aum"].sum()
+        by_client = by_client.sort_values(["aum", "client_id"], ascending=[False, True])
+        top10 = by_client.head(10)["aum"].sum()
 
     return {
         "AUM (naive SUM)": sum_aum if not s.empty else np.nan,
@@ -189,14 +217,26 @@ def pandas_values(snap, fees, txns, dates):
 
 
 # ----------------------------------------------------------------------------- compare
+class Unparseable(Exception):
+    """A Power BI value that isn't a plain number (e.g. '$12.73B' or a decimal comma)."""
+
+
 def to_number(x):
     if x is None or (isinstance(x, float) and np.isnan(x)):
         return np.nan
-    text = str(x).strip().replace(",", "").replace("$", "")
+    text = str(x).strip().replace("−", "-").replace("$", "")
     if text == "" or text.lower() in {"nan", "(blank)", "blank"}:
         return np.nan
+    if text.startswith("(") and text.endswith(")"):        # accounting negative
+        text = "-" + text[1:-1]
+    if "," in text and "." not in text:                    # decimal comma: refuse rather than misread
+        raise Unparseable(x)
+    text = text.replace(",", "")
     pct = text.endswith("%")
-    val = float(text.rstrip("%"))
+    try:
+        val = float(text.rstrip("%"))
+    except ValueError:
+        raise Unparseable(x) from None
     return val / 100 if pct else val
 
 
@@ -206,7 +246,11 @@ def compare(row):
         a = "" if pd.isna(pbi) else str(pbi).strip()
         b = "" if pd.isna(pd_val) else str(pd_val).strip()
         return pd.Series({"abs_diff": np.nan, "match": a == b})
-    a, b = to_number(pbi), to_number(pd_val)
+    try:
+        a, b = to_number(pbi), to_number(pd_val)
+    except Unparseable as bad:                # flag the row instead of crashing the whole run
+        print(f"  could not read value {bad} for {m} / {row['slice']} - marked as mismatch")
+        return pd.Series({"abs_diff": np.nan, "match": False})
     if np.isnan(a) and np.isnan(b):           # both blank (e.g. 2020 has no prior year)
         return pd.Series({"abs_diff": 0.0, "match": True})
     if np.isnan(a) or np.isnan(b):
@@ -235,6 +279,10 @@ def main():
     pbi = pbi.rename(columns={"value": "powerbi_value"})
     pbi["measure"] = pbi["measure"].str.strip()
     pbi["slice"] = pbi["slice"].str.strip()
+    dupes = pbi[pbi.duplicated(["measure", "slice"], keep=False)]
+    if not dupes.empty:
+        sys.exit("powerbi_values.csv has duplicate measure/slice rows - remove them:\n"
+                 + dupes.to_string(index=False))
 
     rec = pv.merge(pbi[["measure", "slice", "powerbi_value"]], on=["measure", "slice"], how="outer",
                    indicator=True)
