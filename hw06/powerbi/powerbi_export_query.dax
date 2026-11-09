@@ -1,0 +1,43 @@
+// HW6 - export every reconciliation value in one go (DAX query view -> paste -> Run)
+// Then: Copy the result grid (with headers) and paste it into reports/powerbi_values.csv
+EVALUATE
+UNION (
+    ROW ( "measure", "AUM (naive SUM)", "slice", "Total", "value", VAR v = [AUM (naive SUM)] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Total Fees", "slice", "Total", "value", VAR v = [Total Fees] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Net Flows", "slice", "Total", "value", VAR v = [Net Flows] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Ending AUM", "slice", "Total", "value", VAR v = [Ending AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Ending Clients", "slice", "Total", "value", VAR v = [Ending Clients] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Avg AUM per Client", "slice", "Total", "value", VAR v = [Avg AUM per Client] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Ending AUM LY", "slice", "Total", "value", VAR v = [Ending AUM LY] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "AUM YoY %", "slice", "Total", "value", VAR v = [AUM YoY %] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Ending AUM PM", "slice", "Total", "value", VAR v = [Ending AUM PM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "AUM MoM %", "slice", "Total", "value", VAR v = [AUM MoM %] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Avg Monthly AUM", "slice", "Total", "value", VAR v = [Avg Monthly AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Fee Yield (bps)", "slice", "Total", "value", VAR v = [Fee Yield (bps)] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Organic Growth Rate", "slice", "Total", "value", VAR v = [Organic Growth Rate] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "AUM-Weighted Alpha", "slice", "Total", "value", VAR v = [AUM-Weighted Alpha] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    ROW ( "measure", "Alpha Signal", "slice", "Total", "value", [Alpha Signal] ),
+    ROW ( "measure", "Top 10 Client Share", "slice", "Total", "value", VAR v = [Top 10 Client Share] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "AUM (naive SUM)", "slice", "Year=" & dim_date[year], "value", VAR v = [AUM (naive SUM)] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Ending AUM", "slice", "Year=" & dim_date[year], "value", VAR v = [Ending AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Ending AUM LY", "slice", "Year=" & dim_date[year], "value", VAR v = [Ending AUM LY] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "AUM YoY %", "slice", "Year=" & dim_date[year], "value", VAR v = [AUM YoY %] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Avg Monthly AUM", "slice", "Year=" & dim_date[year], "value", VAR v = [Avg Monthly AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Fee Yield (bps)", "slice", "Year=" & dim_date[year], "value", VAR v = [Fee Yield (bps)] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Organic Growth Rate", "slice", "Year=" & dim_date[year], "value", VAR v = [Organic Growth Rate] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "AUM-Weighted Alpha", "slice", "Year=" & dim_date[year], "value", VAR v = [AUM-Weighted Alpha] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ),
+    SELECTCOLUMNS ( VALUES ( dim_date[year] ), "measure", "Alpha Signal", "slice", "Year=" & dim_date[year], "value", [Alpha Signal] ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Ending AUM", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Ending AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Avg AUM per Client", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Avg AUM per Client] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Ending AUM LY", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Ending AUM LY] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "AUM YoY %", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [AUM YoY %] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Fee Yield (bps)", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Fee Yield (bps)] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Organic Growth Rate", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Organic Growth Rate] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "AUM-Weighted Alpha", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [AUM-Weighted Alpha] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Alpha Signal", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", [Alpha Signal] ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( SELECTCOLUMNS ( VALUES ( dim_client[client_tier] ), "measure", "Top 10 Client Share", "slice", "Tier=" & dim_client[client_tier] & "|2024", "value", VAR v = [Top 10 Client Share] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024 ),
+    CALCULATETABLE ( ROW ( "measure", "Ending AUM", "slice", "Month=2024-12", "value", VAR v = [Ending AUM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024, dim_date[month] = 12 ),
+    CALCULATETABLE ( ROW ( "measure", "Ending AUM PM", "slice", "Month=2024-12", "value", VAR v = [Ending AUM PM] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024, dim_date[month] = 12 ),
+    CALCULATETABLE ( ROW ( "measure", "AUM MoM %", "slice", "Month=2024-12", "value", VAR v = [AUM MoM %] RETURN IF ( ISBLANK ( v ), BLANK (), FORMAT ( v, "0.0000000000" ) ) ), dim_date[year] = 2024, dim_date[month] = 12 )
+)
+ORDER BY [slice], [measure]
